@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 venv
 .venv
+
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
