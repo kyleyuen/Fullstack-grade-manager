@@ -34,7 +34,7 @@ A **fullstack web application** for managing student grades built with **React, 
 
 ## Why This Project?
 
-This project is one of my **flagship fullstack applications** and demonstrates my ability to:
+This project demonstrates my ability to:
 
 - **Build end-to-end fullstack applications** from scratch, integrating both frontend and backend seamlessly.  
 - **Develop RESTful APIs** and connect them to a responsive frontend interface.  
