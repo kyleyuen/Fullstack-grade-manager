@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import './index.css'
 
-
 function App() {
   const [students, setStudents] = useState([]);
   const [status, setStatus] = useState('idle');
   const [studentName, setStudentName] = useState('');
   const [grade, setGrade] = useState('');
 
+  // fetch existing students
   useEffect(() => {
     async function fetchStudents() {
       setStatus('loading');
@@ -23,15 +23,28 @@ function App() {
     fetchStudents();
   }, []);
 
-  const addStudent = () => {
-    console.log("Add Student clicked");
+  // add new student
+  const addStudent = async () => {
+    if (!studentName || !grade) return;
+    setStatus('loading');
+    try {
+      const res = await fetch('/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_name: studentName, grade: Number(grade) })
+      });
+      const newStudent = await res.json();
+      setStudents(prev => [...prev, newStudent]);
+      setStudentName('');
+      setGrade('');
+      setStatus('idle');
+    } catch {
+      setStatus('error');
+    }
   };
 
-
-  // return JSX here...
   return (
     <div className="p-4">
-      {/* UI for grade manager */}
       {status === 'loading' && <p>Loading students...</p>}
       {status === 'error' && <p>Error loading students.</p>}
 
@@ -68,8 +81,6 @@ function App() {
           <p><strong>Grade:</strong> {student.grade}</p>
         </div>
       ))}
-
-
     </div>
   );
 }
