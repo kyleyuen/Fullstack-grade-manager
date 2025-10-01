@@ -30,3 +30,6 @@ venv
 node_modules/
 jspm_packages/
 
+# Ignore local SQLite database
+Backend/grades.db
+
