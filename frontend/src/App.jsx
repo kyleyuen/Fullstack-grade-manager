@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import './index.css'
+import './index.css';
+
+// Use environment variable for API URL
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -7,76 +10,81 @@ function App() {
   const [studentName, setStudentName] = useState('');
   const [grade, setGrade] = useState('');
 
-  // fetch existing students
+  // Fetch existing students
   useEffect(() => {
     async function fetchStudents() {
       setStatus('loading');
       try {
-        const res = await fetch('/students');
+        const res = await fetch(`${API}/students`);
+        if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setStudents(data);
         setStatus('idle');
-      } catch {
+      } catch (err) {
+        console.error(err);
         setStatus('error');
       }
     }
     fetchStudents();
   }, []);
 
-  // add new student
+  // Add new student
   const addStudent = async () => {
     if (!studentName || !grade) return;
     setStatus('loading');
     try {
-      const res = await fetch('/students', {
+      const res = await fetch(`${API}/students`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ student_name: studentName, grade: Number(grade) })
+        body: JSON.stringify({ student_name: studentName, grade: Number(grade) }),
       });
+      if (!res.ok) throw new Error('Failed to add student');
       const newStudent = await res.json();
       setStudents(prev => [...prev, newStudent]);
       setStudentName('');
       setGrade('');
       setStatus('idle');
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus('error');
     }
   };
 
   return (
-    <div className="p-4">
-      {status === 'loading' && <p>Loading students...</p>}
-      {status === 'error' && <p>Error loading students.</p>}
+    <div className="p-4 max-w-md mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Grade Manager</h1>
 
-      <div className="mb-4 p-4 border rounded shadow">
+      {status === 'loading' && <p className="text-blue-500 mb-2">Loading...</p>}
+      {status === 'error' && <p className="text-red-500 mb-2">Error connecting to backend.</p>}
+
+      <div className="mb-4 p-4 border rounded shadow flex flex-wrap gap-2">
         <input
           type="text"
           placeholder="Student Name"
           value={studentName}
           onChange={e => setStudentName(e.target.value)}
-          className="border p-2 rounded mr-2"
+          className="border p-2 rounded flex-1 min-w-[120px]"
         />
         <input
           type="number"
           placeholder="Grade"
           value={grade}
           onChange={e => setGrade(e.target.value)}
-          className="border p-2 rounded mr-2 w-20"
+          className="border p-2 rounded w-20"
         />
         <button
           onClick={addStudent}
           className="bg-blue-500 text-white p-2 rounded"
           disabled={status === 'loading'}
         >
-          Add Student
+          Add
         </button>
       </div>
 
+      {students.length === 0 && <p>No students yet.</p>}
+
       {students.map(student => (
-        <div
-          key={student.id}
-          className="border shadow-md rounded-lg p-4 mb-2"
-        >
+        <div key={student.id} className="border shadow-md rounded-lg p-4 mb-2">
           <p><strong>Name:</strong> {student.student_name}</p>
           <p><strong>Grade:</strong> {student.grade}</p>
         </div>
