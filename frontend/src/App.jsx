@@ -13,19 +13,22 @@ function App() {
   // Fetch existing students
   useEffect(() => {
     async function fetchStudents() {
-      setStatus('loading');
+      setStatus('loading'); // Set loading status
       try {
-        const res = await fetch(`${API}/students`);
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
+        const res = await fetch(`${API}/students`); // Fetch from backend
+        if (!res.ok) throw new Error('Failed to fetch'); //Provide error if fails
+        const data = await res.json(); //store data into json 
+
+        // Update state
         setStudents(data);
         setStatus('idle');
-      } catch (err) {
+
+      } catch (err) { // Catch any errors
         console.error(err);
         setStatus('error');
       }
     }
-    fetchStudents();
+    fetchStudents(); // Call the function
   }, []);
 
   // Add new student
@@ -33,16 +36,20 @@ function App() {
     if (!studentName || !grade) return;
     setStatus('loading');
     try {
-      const res = await fetch(`${API}/students`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ student_name: studentName, grade: Number(grade) }),
+      const res = await fetch(`${API}/students`, { // Post request to backend
+        method: 'POST', // Use POST method 
+        headers: { 'Content-Type': 'application/json' }, // Set content type to JSON
+        body: JSON.stringify({ student_name: studentName, grade: Number(grade) }), //Send it as a template literal
       });
-      if (!res.ok) throw new Error('Failed to add student');
+      if (!res.ok) throw new Error('Failed to add student'); // Error handling
       const newStudent = await res.json();
-      setStudents(prev => [...prev, newStudent]);
+      setStudents(prev => [...prev, newStudent]); // Update state with new student
+
+      // Clear input fields
       setStudentName('');
       setGrade('');
+
+      // Reset status
       setStatus('idle');
     } catch (err) {
       console.error(err);
